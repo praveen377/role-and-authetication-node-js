@@ -1,7 +1,8 @@
 const router = require("express").Router();
 
+const { json } = require("body-parser");
 //bring to the user registration function
-const { userRegister,userLogin } = require("../utils/auth");
+const { userRegister,userLogin,userAuth , serializeUser ,checkRole} = require("../utils/auth");
 
 //users registration route
 router.post("/register-user" , async(req,res) => {
@@ -34,13 +35,22 @@ router.post("/login-super-admin" , async(req,res) => {
 });
 
 //profile route
-router.get("profile" , async(req,res)=> {})
+router.get("/profile" ,userAuth, async(req,res)=> {
+    
+    return res.json( serializeUser(req.user) )
+});
 
 //users protected  route
-router.post("/user-protected" , async(req,res) => {});
+router.get("/user-protected" ,userAuth,checkRole(["user"]), async(req,res) => {
+    return res.json("hello user");
+});
 //admin protected  route
-router.post("/admin-protected" , async(req,res) => {});
+router.get("/admin-protected" ,userAuth,checkRole(["admin"]), async(req,res) => {
+    return res.json("hello admin");
+});
 //super admin Protected route
-router.post("/super-admin-protected" , async(req,res) => {});
+router.get("/super-admin-protected" ,userAuth,checkRole(["superadmin"]), async(req,res) => {
+    return res.json("hello super admin");
+});
 
 module.exports = router;
